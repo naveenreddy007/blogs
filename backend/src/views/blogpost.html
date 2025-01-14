@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Blog Post</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        label, input, textarea {
+            margin-bottom: 10px;
+        }
+        button {
+            max-width: 200px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Create a New Blog Post</h1>
+    <form id="blogForm">
+        <label for="title">Title:</label>
+        <input type="text" id="title" required>
+
+        <label for="excerpt">Excerpt:</label>
+        <textarea id="excerpt" required></textarea>
+
+        <label for="content">Content:</label>
+        <textarea id="content" required></textarea>
+
+        <label for="author">Author:</label>
+        <input type="text" id="author" required>
+
+        <label for="category">Category:</label>
+        <input type="text" id="category" required>
+
+        <label for="featured">Featured:</label>
+        <input type="checkbox" id="featured">
+
+        <label for="readTime">Read Time:</label>
+        <input type="text" id="readTime" required>
+
+        <label for="image">Image URL:</label>
+        <input type="url" id="image" required>
+
+        <button type="submit">Create Blog Post</button>
+    </form>
+
+    <div id="result"></div>
+
+    <script>
+        document.getElementById('blogForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = {
+                title: document.getElementById('title').value,
+                excerpt: document.getElementById('excerpt').value,
+                content: document.getElementById('content').value,
+                author: document.getElementById('author').value,
+                category: document.getElementById('category').value,
+                featured: document.getElementById('featured').checked,
+                readTime: document.getElementById('readTime').value,
+                image: document.getElementById('image').value
+            };
+
+            try {
+                const response = await fetch('http://localhost:5000/api/blogs', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData),
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('result').innerHTML = `
+                        <h2>Blog Post Created Successfully!</h2>
+                        <p>Title: ${result.title}</p>
+                        <p>Author: ${result.author}</p>
+                        <p>Category: ${result.category}</p>
+                    `;
+                    document.getElementById('blogForm').reset();
+                } else {
+                    throw new Error(result.message || 'Failed to create blog post');
+                }
+            } catch (error) {
+                document.getElementById('result').innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        });
+    </script>
+</body>
+</html>
+
